@@ -1,0 +1,25 @@
+---
+# tasks file for roles/bootstrap
+
+- name: Create user "{{ bootstrap_user }}"
+  ansible.builtin.user:
+    name: "{{ bootstrap_user }}"
+    shell: /bin/bash
+    create_home: yes
+
+- name: Install SSH pulic key
+  ansible.posix.authorized_key:
+    user: "{{ bootstrap_user }}"
+    state: present
+    key: "{{ lookup('file', bootstrap_ssh_key_path) }}"
+
+- name: Install sudo on Debian family
+  import_tasks: debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Configure sudo
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/ansible
+    mode: "0440"
+    content: |
+      ansible ALL=(ALL) NOPASSWD:ALL

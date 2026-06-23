@@ -1,0 +1,6 @@
+---
+
+- name: Install sudo
+  ansible.builtin.apt:
+    name: sudo
+    state: present

@@ -1,0 +1,5 @@
+---
+# defaults file for roles/bootstrap
+
+bootstrap_user: ansible
+bootstrap_ssh_key_path: "{{ lookup('env', 'HOME') + '/.ssh/id_ed25519.pub' }}"
