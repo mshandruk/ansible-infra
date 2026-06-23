@@ -1,9 +1,13 @@
 ---
+
 - hosts: all
-  become: true
+  gather_facts: false
+  vars:
+    ssh_key_path: "{{ lookup('env', 'HOME') + '/.ssh/id_ed25519.pub' }}"
+
   tasks:
-    - name: Set authorized key taken from file
+    - name: Install SSH public key
       ansible.posix.authorized_key:
         user: "{{ ansible_user }}"
         state: present
-        key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+        key: "{{ lookup('file', ssh_key_path) }}"
