@@ -17,9 +17,9 @@
   import_tasks: debian.yml
   when: ansible_os_family == 'Debian'
 
-- name: Configure sudo
-  ansible.builtin.copy:
-    dest: /etc/sudoers.d/ansible
+- name: Configure sudo for user {{ bootstrap_user }}
+  ansible.builtin.template:
+    src: sudoers.j2
+    dest: /etc/sudoers.d/{{ bootstrap_user }}
     mode: "0440"
-    content: |
-      ansible ALL=(ALL) NOPASSWD:ALL
+    validate: "/usr/sbin/visudo -cf %s"
