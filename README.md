@@ -42,6 +42,20 @@ apt install -y ansible sshpass git
 | `playbooks/`   | Entry-point playbooks  |
 | `roles/`       | Reusable Ansible roles |
 
+## Roles
+
+Each role is responsible for a single area of system configuration.
+
+Current roles:
+
+| Role        | Description                                                                                                 |
+| ----------- | ----------------------------------------------------------------------------------------------------------- |
+| `bootstrap` | Prepare a new host for Ansible automation (create automation user, configure sudo, install SSH public key). |
+| `common`    | Configure common system settings (timezone, locales, base packages).                                        |
+| `docker`    | Install and configure Docker.                                                                               |
+| `gateway`   | Configure the gateway server.                                                                               |
+| `kvm`       | Configure the KVM virtualization host.                                                                      |
+
 ---
 
 ## Target Definition

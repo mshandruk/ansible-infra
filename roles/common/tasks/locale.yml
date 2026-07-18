@@ -1,0 +1,7 @@
+---
+
+- name: Configure locale
+  community.general.locale_gen:
+    name: "{{ item }}"
+  with_items:
+    - "{{ common_locales }}"
