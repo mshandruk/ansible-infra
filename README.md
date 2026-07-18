@@ -1,46 +1,208 @@
 # ansible-infra
-Collection ansible roles and playbooks
 
-### Install ansible
+Collection of Ansible playbooks and roles for managing Linux infrastructure.
 
-Debian like
-```
-apt -y install ansible sshpass
-```
+---
 
-Centos
-```
-yum -y install epel-release
-yum -y install ansible sshpass
-```
+## Requirements
 
-Fedora
-```
-dnf -y install ansible sshpass
-```
+- Linux
+- Git
+- Ansible
+- sshpass _(optional, for password authentication)_
 
-### Inventory
-https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html#alternative-directory-layout
+---
 
-Show inventory
-````
-ansible-inventory -i inventories/test --list
-````
+## Preparing the Control Node
 
-### Examples usage
+Install the required packages on the machine where Ansible will be executed.
 
-For example tests inventory
+### Debian / Ubuntu
 
-Install key on remote hosts (root)
-```
-ansible-playbook playbooks/upload-sshkey.yml -i inventories/test -e username="root" -u root -k
-```
-Special user sa (Ubuntu)
-```
-ansible-playbook playbooks/upload-sshkey.yml -i inventories/test -e username="sa" -l ubuntu.test.lab -u sa -k -b -K
+```bash
+apt update
+apt install -y ansible sshpass git
 ```
 
-Check alive hosts
+---
+
+## Project Layout
+
+```text
+.
+├── ansible.cfg
+├── inventories/
+├── playbooks/
+└── roles/
 ```
-ansible -i inventories/test -m ping all -u root
+
+| Directory      | Description            |
+| -------------- | ---------------------- |
+| `inventories/` | Inventory files        |
+| `playbooks/`   | Entry-point playbooks  |
+| `roles/`       | Reusable Ansible roles |
+
+---
+
+## Target Definition
+
+`<target>` may be either:
+
+- an inventory file or directory
+- a single host (for example `192.168.1.10,`)
+
+Examples:
+
+```bash
+-i inventories/lab
 ```
+
+```bash
+-i 192.168.1.10,
+```
+
+---
+
+## Inventory
+
+Show inventory tree
+
+```bash
+ansible-inventory -i <target> --graph
+```
+
+Show variables for a host
+
+```bash
+ansible-inventory -i <target> --host <host>
+```
+
+---
+
+## Connectivity
+
+Ping all hosts
+
+```bash
+ansible all -i <target> -m ping
+```
+
+Ping using a specific user
+
+```bash
+ansible all -i <target> -m ping -u <user>
+```
+
+Ping using password authentication
+
+```bash
+ansible all -i <target> -m ping -u <user> -k
+```
+
+---
+
+## Playbooks
+
+### Bootstrap
+
+Prepare a host for Ansible automation.
+
+Connect as **root**:
+
+```bash
+ansible-playbook playbooks/bootstrap.yml \
+    -i <target> \
+    -u root \
+    -k
+```
+
+Connect as a **sudo** user:
+
+```bash
+ansible-playbook playbooks/bootstrap.yml \
+    -i <target> \
+    -u <user> \
+    -k \
+    -b \
+    -K
+```
+
+### Upload SSH Public Key
+
+Install the local SSH public key into the remote user's `authorized_keys`.
+
+```bash
+ansible-playbook playbooks/upload-sshkey.yml \
+    -i <target> \
+    -u <user> \
+    -k
+```
+
+Run for a single host
+
+```bash
+ansible-playbook playbooks/upload-sshkey.yml \
+    -i <target> \
+    -l <host> \
+    -u <user> \
+    -k
+```
+
+### Upgrade System
+
+```bash
+ansible-playbook playbooks/upgrade-system.yml \
+    -i <target>
+```
+
+---
+
+## Diagnostics
+
+Syntax check
+
+```bash
+ansible-playbook playbooks/bootstrap.yml --syntax-check
+```
+
+List tasks
+
+```bash
+ansible-playbook playbooks/bootstrap.yml --list-tasks
+```
+
+Dry run
+
+```bash
+ansible-playbook playbooks/bootstrap.yml --check
+```
+
+Show file differences
+
+```bash
+ansible-playbook playbooks/bootstrap.yml --diff
+```
+
+Gather all system facts
+
+```bash
+ansible all -i <target> -m setup
+```
+
+Show operating system information only
+
+```bash
+ansible all \
+    -i <target> \
+    -m setup \
+    -a "filter=ansible_distribution*"
+```
+
+---
+
+## References
+
+- Ansible Best Practices
+  https://docs.ansible.com/ansible/latest/tips_tricks/sample_setup.html
+- Alternative Directory Layout
+  https://docs.ansible.com/ansible/latest/tips_tricks/sample_setup.html#alternative-directory-layout
