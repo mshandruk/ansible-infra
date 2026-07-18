@@ -56,6 +56,19 @@ Current roles:
 | `gateway`   | Configure the gateway server.                                                                               |
 | `kvm`       | Configure the KVM virtualization host.                                                                      |
 
+Role defaults are stored in:
+
+```text
+roles/<role>/defaults/main.yml
+```
+
+Inventory-specific values should be overridden using:
+
+```text
+inventories/<inventory>/group_vars/
+inventories/<inventory>/host_vars/
+```
+
 ---
 
 ## Target Definition
@@ -79,6 +92,18 @@ Examples:
 
 ## Inventory
 
+The repository contains an example inventory layout.
+
+```text
+inventories/
+├── example/
+│   ├── hosts.yml
+│   ├── group_vars/
+│   │   └── all.yml
+│   └── host_vars/
+└── lab/
+```
+
 Show inventory tree
 
 ```bash
@@ -91,7 +116,13 @@ Show variables for a host
 ansible-inventory -i <target> --host <host>
 ```
 
----
+The inventory is responsible for:
+
+- defining hosts and groups;
+- connection variables (for example `ansible_user`);
+- infrastructure-specific varabile overrides.
+
+Role defaults should **not** be modified directly. Override them in `group_vars/` or `host_vars/`.
 
 ## Connectivity
 
