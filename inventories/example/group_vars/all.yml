@@ -1,0 +1,13 @@
+---
+
+# SSH
+ansible_user: ansible
+
+# Common role override
+common_timezone: Europe/Moscow
+common_locales:
+  - en_US.UTF-8
+  - ru_RU.UTF-8
+
+common_packages:
+  - vim
