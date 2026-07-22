@@ -5,7 +5,7 @@
   ansible.builtin.user:
     name: "{{ bootstrap_user }}"
     shell: /bin/bash
-    create_home: yes
+    create_home: true
 
 - name: Install SSH pulic key
   ansible.posix.authorized_key:
@@ -14,7 +14,7 @@
     key: "{{ lookup('file', bootstrap_ssh_key_path) }}"
 
 - name: Install sudo on Debian family
-  import_tasks: debian.yml
+  ansible.builtin.import_tasks: debian.yml
   when: ansible_os_family == 'Debian'
 
 - name: Configure sudo for user {{ bootstrap_user }}

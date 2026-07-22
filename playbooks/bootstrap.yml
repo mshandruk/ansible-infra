@@ -1,5 +1,7 @@
 ---
-- hosts: all
+
+- name: Bootstrapp all hosts
+  hosts: all
 
   roles:
     - bootstrap
