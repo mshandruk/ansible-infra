@@ -21,7 +21,7 @@ Install the required packages on the machine where Ansible will be executed.
 
 ```bash
 apt update
-apt install -y ansible sshpass git
+apt install -y ansible sshpass git ansible-lint
 ```
 
 ---
@@ -208,6 +208,12 @@ Syntax check
 
 ```bash
 ansible-playbook playbooks/bootstrap.yml --syntax-check
+```
+
+Lint
+
+```bash
+ansible-lint playbooks/<some.yml>
 ```
 
 List tasks
