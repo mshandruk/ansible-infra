@@ -1,6 +1,7 @@
 ---
 
-- name: Configure timezone
+- name: Set timezone {{ common_timezone }}
   community.general.timezone:
-    name: "{{ сommon_timezone }}"
+    name: "{{ common_timezone }}"
+  become: true
 
