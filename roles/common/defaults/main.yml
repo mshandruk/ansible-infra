@@ -1,7 +1,7 @@
 ---
 # defaults file for common
 
-сommon_timezone: Etc/UTC
+common_timezone: "Etc/UTC"
 common_locales:
   - en_US.UTF-8
 

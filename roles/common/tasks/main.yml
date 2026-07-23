@@ -1,7 +1,15 @@
 ---
 # tasks file for common
 
-- import_tasks: timezone.yml
-- import_tasks: locale.yml
-- import_tasks: packages.yml
-  when: ansible_os_family == 'Debian'
+- name: Apply base system configuration
+  become: true
+  block:
+    - name: Configure system timezone
+      ansible.builtin.import_tasks: timezone.yml
+
+    - name: Configure system locale
+      ansible.builtin.import_tasks: locale.yml
+
+    - name: Manage Debian package dependencies
+      ansible.builtin.import_tasks: debian_packages.yml
+      when: ansible_os_family == 'Debian'

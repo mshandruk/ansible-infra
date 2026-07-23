@@ -3,5 +3,3 @@
 - name: Set timezone {{ common_timezone }}
   community.general.timezone:
     name: "{{ common_timezone }}"
-  become: true
-
