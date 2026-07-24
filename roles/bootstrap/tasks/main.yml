@@ -1,25 +1,31 @@
 ---
 # tasks file for roles/bootstrap
 
-- name: Create user "{{ bootstrap_user }}"
-  ansible.builtin.user:
-    name: "{{ bootstrap_user }}"
-    shell: /bin/bash
-    create_home: true
+- name: Provision bootstrap
+  become: true
+  block:
+    - name: Create managment user
+      ansible.builtin.user:
+        name: "{{ bootstrap_user }}"
+        shell: /bin/bash
+        create_home: true
 
-- name: Install SSH pulic key
-  ansible.posix.authorized_key:
-    user: "{{ bootstrap_user }}"
-    state: present
-    key: "{{ lookup('file', bootstrap_ssh_key_path) }}"
+    - name: Upload SSH pulic key
+      ansible.posix.authorized_key:
+        user: "{{ bootstrap_user }}"
+        state: present
+        key: "{{ lookup('file', bootstrap_ssh_key_path) }}"
 
-- name: Install sudo on Debian family
-  ansible.builtin.import_tasks: debian.yml
-  when: ansible_os_family == 'Debian'
+    - name: Ensure sudo package is installed (Debian only)
+      ansible.builtin.apt:
+        name: sudo
+        state: present
+        update_cache: true
+      when: ansible_os_family == 'Debian' and ansible_distribution != 'Ubuntu'
 
-- name: Configure sudo for user {{ bootstrap_user }}
-  ansible.builtin.template:
-    src: sudoers.j2
-    dest: /etc/sudoers.d/{{ bootstrap_user }}
-    mode: "0440"
-    validate: "/usr/sbin/visudo -cf %s"
+    - name: Configure sudo permissions
+      ansible.builtin.template:
+        src: sudoers.j2
+        dest: "/etc/sudoers.d/{{ bootstrap_user }}"
+        mode: "0440"
+        validate: "/usr/sbin/visudo -cf %s"
