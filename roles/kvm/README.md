@@ -1,63 +1,41 @@
-Kvm
-=========
+# kvm
 
-A role kvm
+Ansible role for install and configure KVM hypervisor on Linux servers.
 
-Role Variables
---------------
-username: <username add to groups: libvirt, libvirt-qemu>
+## Requirements
 
-Example Playbook
-----------------
+- Debian 13+
+- Ubuntu 22.04+
 
-    - hosts: kvm
-      become: true
-      roles:
-         - { role: kvm }
+> Older distributions may work but are not regularly tested.
 
-1. Clone this repository
+## Role Variables
 
-2. Install public ssh-key on remote host
+| Variable          | Default | Description                                           |
+| ----------------- | ------- | ----------------------------------------------------- |
+| `kvm_admin`       | root    | System user to be added to `libvirt` and `kvm` groups |
+| `kvm_install_gui` | false   | Install graphical managment tools (`virt-manager`)    |
 
-```
-ssh-copy-id -i ~/.ssh/id_rsa.pub root@debian.test.lab
-```
+## Features
 
-3. Generate inventory
+- Installs KVM hypervisor components, CLI managment tools (`virt-install`), and optional GUI (`virt-manager`)
+- Grant KVM management permissions to the specified administrator user.
+- Configure kvm aministrator
 
-```bash
-cat <<EOF  > inventory
-[kvm]
-debian.test.lab
-EOF
-```
+## Dependencies
 
-4. Generate playbook
+None.
 
-```
-cat <<EOF  > play-kvm.yml
-- hosts: kvm
-  become: true
+## Example Playbook
+
+```yaml
+---
+- name: Install KVM
+  hosts: kvm
   roles:
-     - { role: kvm }
-EOF
+    - kvm
 ```
 
-5. Run playbook
+## Author
 
-Install kvm
-
-````
-ansible-playbookkvm.yml -i inventory -u root
-````
-
-Install kvm and virt-manager(for GUI)
-
-````
-ansible-playbookkvm.yml -i inventory -u root --tags=virt-manager
-````
-
-License
--------
-
-MIT
+Maxim Shandruk

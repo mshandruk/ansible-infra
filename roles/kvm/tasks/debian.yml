@@ -1,12 +1,20 @@
 ---
-- name: Install kvm
+- name: Install KVM core and CLI managment tools
   ansible.builtin.apt:
     pkg:
-      - qemu-system
+      - qemu-system-x86
+      - libvirt-clients
       - libvirt-daemon-system
+      - virt-install
+      - bridge-utils
+    state: present
+    update_cache: true
 
-- name: Install virt-manager
+- name: Install GUI management tools
   ansible.builtin.apt:
     pkg:
       - virt-manager
-  tags: [ 'never', 'virt-manager' ]
+      - ssh-askpass
+    state: present
+    update_cache: true
+  when: kvm_install_gui | bool

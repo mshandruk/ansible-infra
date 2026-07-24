@@ -1,7 +1,0 @@
----
-# handlers file for kvm
-- name: restart libvirtd
-  ansible.builtin.systemd:
-    name: libvirtd
-    enabled: yes
-    state: restarted

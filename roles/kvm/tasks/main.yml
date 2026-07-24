@@ -1,13 +1,17 @@
 ---
+
 # tasks file for kvm
-- name: Install on Debian family
-  import_tasks: debian.yml
+
+- name: Install kvm hypervisor components
+  become: true
+  ansible.builtin.import_tasks: debian.yml
   when: ansible_os_family == 'Debian'
 
-- name: Add user in groups libvirt, libvirt-qemu
+- name: Grant KVM management permissions to administrator
+  become: true
   ansible.builtin.user:
-    name: "{{ username }}"
-    groups: libvirt, libvirt-qemu
-    append: yes
-  notify: restart libvirtd
-  when: username is defined
+    name: "{{ kvm_admin }}"
+    groups:
+      - libvirt
+      - kvm
+    append: true
