@@ -1,0 +1,13 @@
+---
+- name: Install gateway components on Debian family
+  ansible.builtin.apt:
+    pkg:
+      - iptables
+      - iptables-persistent
+      - netfilter-persistent
+  when: ansible_os_family == 'Debian'
+
+- name: Enable netfilter-persistent
+  ansible.builtin.systemd:
+    name: netfilter-persistent
+    enabled: true

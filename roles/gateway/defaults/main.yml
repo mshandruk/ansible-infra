@@ -1,0 +1,9 @@
+---
+gateway_input_rules: []
+gateway_forward_rules: []
+gateway_port_forwards: []
+gateway_default_input_policy: DROP
+gateway_default_forward_policy: DROP
+gateway_default_output_policy: ACCEPT
+gateway_enable_masquerade: true
+gateway_reset_rules: false

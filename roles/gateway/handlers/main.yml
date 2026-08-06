@@ -1,4 +1,6 @@
 ---
 # handlers file for roles/gateway
-- name: save rules
-  command: netfilter-persistent save
+- name: Save rules
+  become: true
+  ansible.builtin.command: netfilter-persistent save
+  changed_when: false
