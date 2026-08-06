@@ -33,7 +33,6 @@
     in_interface: "{{ item.interface | default(omit) }}"
     destination_port: "{{ item.port | default(omit) }}"
     ctstate: NEW
-    syn: "{{ (item.protocol == 'tcp') | ternary('match', omit) }}" # Syn only TCP
     icmp_type: "{{ item.icmp_type | default(omit) }}"
     jump: ACCEPT
     comment: "{{ item.comment | default(omit) }}"
