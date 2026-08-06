@@ -9,3 +9,14 @@
     - { chain: FORWARD, policy: "{{ gateway_default_forward_policy }}" }
     - { chain: OUTPUT, policy: "{{ gateway_default_output_policy }}" }
   notify: Save rules
+
+- name: Set default IPv6 firewall policies to DROP
+  ansible.builtin.iptables:
+    ip_version: ipv6
+    chain: "{{ item }}"
+    policy: DROP
+  loop:
+    - INPUT
+    - FORWARD
+    - OUTPUT
+  notify: Save rules

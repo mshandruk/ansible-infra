@@ -32,6 +32,7 @@ A simple gateway (NAT)
 
 - Install iptables, iptables-persistent.
 - Enables IPv4 forwarding in sysctl.
+- Disallow IPv6 default policy.
 - Configure source NAT (masquerade) from iface_lan to iface_wan
 - Manages custom INPUT, FORWARD, and DNAT rules.
 
