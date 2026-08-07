@@ -2,6 +2,7 @@
 
 # SSH
 ansible_user: ansible
+ansible_public_key: "{{ lookup('env', 'HOME') }}/.ssh/id_ed25519_ansible.pub"
 
 # Common role override
 common_timezone: Europe/Moscow

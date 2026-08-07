@@ -3,4 +3,5 @@
 
 bootstrap_user: ansible
 bootstrap_sudo_nopasswd: true
-bootstrap_ssh_key_path: "{{ lookup('env', 'HOME') + '/.ssh/id_ed25519_ansible.pub' }}"
+bootstrap_authorized_keys:
+  - "{{ lookup('file', ansible_public_key) }}"

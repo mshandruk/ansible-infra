@@ -4,24 +4,23 @@
 - name: Provision bootstrap
   become: true
   block:
-    - name: Create managment user
+    - name: Create management user
       ansible.builtin.user:
         name: "{{ bootstrap_user }}"
         shell: /bin/bash
         create_home: true
 
-    - name: Upload SSH pulic key
+    - name: Upload SSH public key
       ansible.posix.authorized_key:
         user: "{{ bootstrap_user }}"
         state: present
-        key: "{{ lookup('file', bootstrap_ssh_key_path) }}"
+        key: "{{  item }}"
+      loop: "{{ bootstrap_authorized_keys }}"
 
-    - name: Ensure sudo package is installed (Debian only)
-      ansible.builtin.apt:
+    - name: Ensure sudo is installed
+      ansible.builtin.package:
         name: sudo
         state: present
-        update_cache: true
-      when: ansible_os_family == 'Debian' and ansible_distribution != 'Ubuntu'
 
     - name: Configure sudo permissions
       ansible.builtin.template:

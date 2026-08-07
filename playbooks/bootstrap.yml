@@ -3,6 +3,7 @@
 - name: Bootstrap
   gather_facts: true
   hosts: all
+  become: true
 
   roles:
     - bootstrap
