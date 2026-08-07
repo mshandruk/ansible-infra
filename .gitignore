@@ -1,1 +1,9 @@
-inventories/lab
+.venv/
+__pycache__/
+*.pyc
+collections/ansible_collections/
+*.log
+*.retry
+.ansible/
+.idea
+.vscode
