@@ -1,7 +1,6 @@
 ---
-
-- name: Common settings
+- name: Apply common system configuration
   hosts: all
-
+  become: true
   roles:
     - common

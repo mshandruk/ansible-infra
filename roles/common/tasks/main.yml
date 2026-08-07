@@ -1,15 +1,19 @@
 ---
 # tasks file for common
 
-- name: Apply base system configuration
+- name: Apply common system configuration
   become: true
   block:
-    - name: Configure system timezone
-      ansible.builtin.import_tasks: timezone.yml
+    - name: Configure timezone
+      community.general.timezone:
+        name: "{{ common_timezone }}"
 
     - name: Configure system locale
-      ansible.builtin.import_tasks: locale.yml
+      community.general.locale_gen:
+        name: "{{ item }}"
+      loop: "{{ common_locales }}"
 
-    - name: Manage Debian package dependencies
-      ansible.builtin.import_tasks: debian_packages.yml
-      when: ansible_os_family == 'Debian'
+    - name: Install baseline apt packages
+      ansible.builtin.package:
+        name: "{{ common_packages }}"
+        state: present

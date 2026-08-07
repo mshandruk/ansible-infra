@@ -1,6 +1,6 @@
 # common
 
-Common system configuration for linux servers.
+Common system configuration for linux hosts.
 
 ## Requirements
 
@@ -9,19 +9,19 @@ Common system configuration for linux servers.
 
 > Older distributions may work but are not regularly tested.
 
-## Role Variables
-
-| Variable          | Default         | Description                  |
-| ----------------- | --------------- | ---------------------------- |
-| `common_timezone` | `etc/UTC`       | Timezone region              |
-| `common_locales`  | ["en_US.UTF-8"] | Locales to generate          |
-| `common_packages` | []              | List of packages for install |
-
 ## Features
 
 - Configure timezone
 - Configure locales
-- Common package installation
+- Install common packages
+
+## Role Variables
+
+| Variable          | Default         | Description         |
+|-------------------|-----------------|---------------------|
+| `common_timezone` | `Etc/UTC`       | System timezone     |
+| `common_locales`  | ["en_US.UTF-8"] | Locales to generate |
+| `common_packages` | []              | Packages to install |
 
 ## Dependencies
 
@@ -29,12 +29,19 @@ None.
 
 ## Example Playbook
 
+`playbooks/common.yml`
+
 ```yaml
 ---
-- hosts: all
+- name: Apply common system configuration
+  hosts: all
   become: true
   roles:
     - common
+```
+
+```bash
+ansible-playbook -i <inventory> playbooks/common.yml
 ```
 
 ## Author
