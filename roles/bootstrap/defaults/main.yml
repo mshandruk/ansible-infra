@@ -3,5 +3,4 @@
 
 bootstrap_user: ansible
 bootstrap_sudo_nopasswd: true
-bootstrap_authorized_keys:
-  - "{{ lookup('file', ansible_public_key) }}"
+bootstrap_authorized_key: "{{ lookup('file', ansible_public_key) }}"

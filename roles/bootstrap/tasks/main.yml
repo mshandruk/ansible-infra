@@ -14,8 +14,7 @@
       ansible.posix.authorized_key:
         user: "{{ bootstrap_user }}"
         state: present
-        key: "{{  item }}"
-      loop: "{{ bootstrap_authorized_keys }}"
+        key: "{{ bootstrap_authorized_key }}"
 
     - name: Ensure sudo is installed
       ansible.builtin.package:

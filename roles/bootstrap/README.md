@@ -23,11 +23,11 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_ansible -N ""
 
 ## Role Variables
 
-| Variable                    | Default                                      | Description                                     |
-|-----------------------------|----------------------------------------------|-------------------------------------------------|
-| `bootstrap_user`            | `ansible`                                    | Automation user name                            |
-| `bootstrap_sudo_nopasswd`   | `true`                                       | Allow passwordless sudo                         |
-| `bootstrap_authorized_keys` | ["{{ lookup('file', ansible_public_key) }}"] | Public key(s) installed for the automation user |
+| Variable                   | Default                                    | Description                                  |
+|----------------------------|--------------------------------------------|----------------------------------------------|
+| `bootstrap_user`           | `ansible`                                  | Automation user name                         |
+| `bootstrap_sudo_nopasswd`  | `true`                                     | Allow passwordless sudo                      |
+| `bootstrap_authorized_key` | "{{ lookup('file', ansible_public_key) }}" | Public key installed for the automation user |
 
 ## Initial bootstrap
 
