@@ -20,7 +20,6 @@ For a newly installed host, the recommended order is:
 | Playbook             | Description                                    |
 |----------------------|------------------------------------------------|
 | `bootstrap.yml`      | Prepare a new host for Ansible automation.     |
-| `upload-sshkey.yml`  | Install an SSH public key for the remote user. |
 | `common.yml`         | Apply common Linux configuration.              |
 | `docker.yml`         | Install and configure Docker.                  |
 | `gateway.yml`        | Configure a Linux gateway.                     |
