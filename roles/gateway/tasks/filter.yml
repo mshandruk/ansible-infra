@@ -6,21 +6,21 @@
     jump: ACCEPT
   notify: Save rules
 
-- name: Drop invalid
-  ansible.builtin.iptables:
-    chain: "{{ item }}"
-    ctstate: INVALID
-    jump: DROP
-  loop:
-    - INPUT
-    - FORWARD
-  notify: Save rules
-
 - name: Allow related, established connections
   ansible.builtin.iptables:
     chain: "{{ item }}"
     ctstate: ESTABLISHED,RELATED
     jump: ACCEPT
+  loop:
+    - INPUT
+    - FORWARD
+  notify: Save rules
+
+- name: Drop invalid
+  ansible.builtin.iptables:
+    chain: "{{ item }}"
+    ctstate: INVALID
+    jump: DROP
   loop:
     - INPUT
     - FORWARD
