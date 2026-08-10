@@ -1,0 +1,131 @@
+{{ gateway_title }}
+
+*filter
+:INPUT {{ gateway_default_input_policy }} [0:0]
+:FORWARD {{ gateway_default_forward_policy }} [0:0]
+:OUTPUT {{ gateway_default_output_policy }} [0:0]
+
+# INPUT Rules
+-A INPUT -i lo -j ACCEPT
+-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -m conntrack --ctstate INVALID -j DROP
+{% set cmd %}
+-A INPUT -p tcp --dport {{ ansible_port | default(22) }} -m conntrack --ctstate NEW
+-m comment --comment "SSH management for Ansible."
+-j ACCEPT
+{% endset %}
+{{ cmd | split | join(' ') }}
+
+{% for rule in gateway_input_rules %}
+    {%- set cmd -%}
+    -A INPUT
+
+    {# Interface adapter(optional) #}
+    {% if rule.interface is defined %}
+        -i {{ rule.interface }}
+    {% endif %}
+
+    {# Source address(optional) #}
+    {% if rule.source is defined %}
+        -s {{ rule.source }}
+    {% endif %}
+
+    -p {{ rule.protocol }} -m {{ rule.protocol }}
+
+    {% if rule.protocol == 'icmp' %}
+        --icmp-type {{ rule.icmp_type | default('echo-request') }}
+    {% else %}
+        --dport {{ rule.port }}
+        -m conntrack --ctstate NEW
+    {% endif %}
+
+    {% if rule.comment is defined %}
+        -m comment --comment "{{ rule.comment }}"
+    {%- endif %}
+
+    -j ACCEPT
+    {%- endset -%}
+{{ cmd | split | join(' ')}}
+{% endfor %}
+
+{# Forward rules #}
+{% if gateway_enable_masquerade | bool or  gateway_forward_rules or gateway_port_forwards %}
+-A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -m conntrack --ctstate INVALID -j DROP
+{% endif %}
+{% for rule in gateway_forward_rules %}
+    {%- set cmd -%}
+        -A FORWARD
+        -i {{ rule.in_interface }} -o {{ rule.out_interface }} -m conntrack --ctstate NEW
+
+        {% if rule.comment is defined %}
+        -m comment --comment "{{ rule.comment }}"
+        {%- endif %}
+
+        -j ACCEPT
+    {%- endset -%}
+{{ cmd | split | join(' ') }}
+{% endfor %}
+
+# FORWARD Port Forwards (DNAT Access)
+{% for rule in gateway_port_forwards %}
+    {%- set cmd -%}
+    -A FORWARD -i {{ rule.in_interface }} -o {{ rule.out_interface }}
+
+    {# Source address(optional) #}
+    {% if rule.source is defined %}
+        -s {{ rule.source }}
+    {% endif %}
+
+    -d {{ rule.destination }}
+    -p {{ rule.protocol }} -m {{ rule.protocol }} --dport {{ rule.destination_port }} -m conntrack --ctstate NEW
+
+    {% if rule.comment is defined %}
+        -m comment --comment "{{ rule.comment }}"
+    {% endif %}
+
+    -j ACCEPT
+    {%- endset -%}
+{{ cmd | split | join(' ') }}
+{% endfor %}
+
+COMMIT
+*nat
+:PREROUTING ACCEPT [42:2520]
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+
+# Prerouting (DNAT Access)
+{% for rule in gateway_port_forwards %}
+    {%- set cmd -%}
+    -A PREROUTING -i {{ rule.in_interface }}
+
+    {# Source address(optional) #}
+    {% if rule.source is defined %}
+        -s {{ rule.source }}
+    {% endif %}
+
+    -p {{ rule.protocol }} -m {{ rule.protocol }} --dport {{ rule.external_port }}
+
+    {% if rule.comment is defined %}
+        -m comment --comment "{{ rule.comment }}"
+    {% endif %}
+
+    -j DNAT --to-destination {{ rule.destination }}:{{ rule.destination_port }}
+    {%- endset -%}
+{{ cmd | split | join(' ') }}
+{% endfor %}
+
+{% if gateway_enable_masquerade | bool %}
+    {%- set cmd -%}
+    -A POSTROUTING -o {{ iface_wan }}
+
+    -m comment --comment "{{ comment | default('Default NAT Masquerade for LAN') }}"
+
+    -j MASQUERADE
+    {%- endset -%}
+{{ cmd | split | join(' ')}}
+{% endif %}
+
+COMMIT

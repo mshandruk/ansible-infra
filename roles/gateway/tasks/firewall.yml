@@ -1,0 +1,22 @@
+---
+
+- name: Generate and apply IPv4 firewall rules
+  ansible.builtin.template:
+    src: rules.v4.j2
+    dest: /etc/iptables/rules.v4
+    group: root
+    owner: root
+    mode: "0644"
+    validate: iptables-restore --test %s
+  notify: Apply ipv4tables rules
+
+
+- name: Generate and apply IPv6 firewall rules (Default DROP)
+  ansible.builtin.template:
+    src: rules.v6.j2
+    dest: /etc/iptables/rules.v6
+    group: root
+    owner: root
+    mode: "0644"
+    validate: iptables-restore --test %s
+  notify: Apply ipv6tables rules

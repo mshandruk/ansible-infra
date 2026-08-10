@@ -1,0 +1,35 @@
+---
+
+- name: Check mandatory global variables
+  ansible.builtin.assert:
+    that:
+      - iface_wan is defined
+      - iface_lan is defined
+    fail_msg: "Missing global vars: 'iface_wan' or 'iface_lan' is undefined."
+
+- name: Check input rules integrity
+  ansible.builtin.assert:
+    that:
+      - item.protocol is defined
+      - "item.protocol not in ['tcp', 'udp'] or item.port is defined"
+    fail_msg: "Rule error ({{ item.comment | default('unnamed') }}): TCP/UDP requires 'port' and 'protocol'."
+  loop: "{{ gateway_input_rules }}"
+
+- name: Check forward rules
+  ansible.builtin.assert:
+    that:
+      - item.in_interface is defined
+      - item.out_interface is defined
+  loop: "{{ gateway_forward_rules }}"
+
+- name: Check port forwarding integrity
+  ansible.builtin.assert:
+    that:
+      - item.in_interface is defined
+      - item.out_interface is defined
+      - item.protocol is defined
+      - item.external_port is defined
+      - item.destination is defined
+      - item.destination_port is defined
+    fail_msg: "Forward error ({{ item.comment | default('unnamed') }}): Missing DNAT parameters."
+  loop: "{{ gateway_port_forwards }}"

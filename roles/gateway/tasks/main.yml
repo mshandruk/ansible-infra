@@ -1,50 +1,16 @@
 ---
 # tasks file for roles/gateway
-- name: Configure gateway
+- name: Validate all variables
+  ansible.builtin.import_tasks: validate.yml
+
+- name: Configure network gateway
   become: true
   block:
-    - name: Verify that required variables are defined
-      ansible.builtin.assert:
-        that:
-          - iface_lan is defined
-          - iface_wan is defined
-        fail_msg: "CRITICAL ERROR: Required variables 'iface_lan' or 'iface_wan' are undefined."
-        success_msg: "All mandatory variables are defined."
-
-    - name: Verify that TCP/UDP rules have ports specified
-      ansible.builtin.assert:
-        that:
-          - item.port is defined
-        fail_msg: "CRITICAL ERROR! Rule for '{{ item.comment | default('unnamed') }}' specifies protocol {{ item.protocol }} but forgot to set 'port'. This would
-          open ALL ports!"
-      loop: "{{ gateway_input_rules }}"
-      when: item.protocol in ['tcp', 'udp']
-
-    - name: Verify port forwarding configuration integrity
-      ansible.builtin.assert:
-        that:
-          - item.external_port is defined
-          - item.destination_port is defined
-          - item.destination is defined
-        fail_msg: "CRITICAL ERROR! Port forward rule '{{ item.name | default('unnamed') }}' is missing external_port, destination_port, or destination IP. Running
-          this will misconfigure NAT!"
-      loop: "{{ gateway_port_forwards }}"
-
     - name: Install gateway components
       ansible.builtin.import_tasks: install.yml
 
-    - name: Set sysctl
+    - name: Configure sysctl
       ansible.builtin.import_tasks: sysctl.yml
 
-    - name: Reset all rules
-      ansible.builtin.import_tasks: reset.yml
-      when: gateway_reset_rules | bool
-
-    - name: Apply rules for filter table
-      ansible.builtin.import_tasks: filter.yml
-
-    - name: Apply rules for nat table
-      ansible.builtin.import_tasks: nat.yml
-
-    - name: Default policy
-      ansible.builtin.import_tasks: policy.yml
+    - name: Import firewall configuration
+      ansible.builtin.import_tasks: firewall.yml

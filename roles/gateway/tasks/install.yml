@@ -1,4 +1,15 @@
 ---
+- name: Prevent iptables-persistent from asking interactive questions
+  ansible.builtin.debconf:
+    name: iptables-persistent
+    question: "{{ item }}"
+    value: "false"
+    vtype: "boolean"
+  loop:
+    - iptables-persistent/autosave_v4
+    - iptables-persistent/autosave_v6
+  when: ansible_os_family == 'Debian'
+
 - name: Install gateway components on Debian family
   ansible.builtin.apt:
     pkg:
@@ -11,3 +22,4 @@
   ansible.builtin.systemd:
     name: netfilter-persistent
     enabled: true
+    state: started

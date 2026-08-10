@@ -1,6 +1,6 @@
 # gateway
 
-A simple gateway (NAT)
+A simple internet gateway
 
 ## Requirements
 
@@ -13,20 +13,20 @@ A simple gateway (NAT)
 ### Required Variables
 
 | Variable    | Default | Description   |
-| ----------- | ------- | ------------- |
+|-------------|---------|---------------|
 | `iface_lan` |         | Lan interface |
 | `iface_wan` |         | Wan interface |
 
 ### Optional Variables
 
-| Variable                | Default | Description                                             |
-| ----------------------- | ------- | ------------------------------------------------------- |
-| `gateway_reset_rules`   | `false` | Force reset all firewall rules before applying new ones |
-| `gateway_input_rules`   | `[]`    | List of allowed incoming rules for the INPUT chain      |
-| `gateway_port_forwards` | `[]`    | List of port forwarding (DNAT) rules                    |
-| `gateway_forward_rules` | `[]`    | List of allowed transit rules for the FORWARD chain     |
+| Variable                | Default | Description                                         |
+|-------------------------|---------|-----------------------------------------------------|
+| `gateway_input_rules`   | `[]`    | List of allowed incoming rules for the INPUT chain  |
+| `gateway_port_forwards` | `[]`    | List of port forwarding (DNAT) rules                |
+| `gateway_forward_rules` | `[]`    | List of allowed transit rules for the FORWARD chain |
 
 > Default variables values can be found in `defaults/main.yml`.
+> Note: By default, the port for Ansible is allowed in the `filter` table's `input` chain, see templates/rules.v4.j2
 
 ## Features
 
@@ -68,7 +68,40 @@ all:
 
 inventories/lab/host_vars/gw.yml
 
+Internet gateway
+
+```yaml
+---
+iface_wan: enp1s0
+iface_lan: enp7s0
+
+gateway_enable_masquerade: true
+gateway_forward_rules:
+  - in_interface: "{{ iface_lan }}"
+    out_interface: "{{ iface_wan }}"
+    comment: Allow LAN to WAN internet access
+```
+
+Port forwarding gateway
+
 ```yml
+---
+iface_wan: enp1s0
+iface_lan: enp7s0
+
+gateway_port_forwards:
+  - protocol: tcp
+    external_port: 80
+    destination: 10.0.0.2
+    destination_port: 8080
+    in_interface: "{{ iface_wan }}"
+    out_interface: "{{ iface_lan }}"
+    comment: Allow access to web site
+```
+
+Allow icmp
+
+```yaml
 ---
 iface_wan: enp1s0
 iface_lan: enp7s0
@@ -76,24 +109,7 @@ iface_lan: enp7s0
 gateway_input_rules:
   - protocol: icmp
     icmp_type: echo-request
-
-  - protocol: tcp
-    port: 22
-    interface: "{{ iface_wan }}"
-    comment: SSH access for management
-
-gateway_port_forwards:
-  - protocol: tcp
-    external_port: 5222
-    destination: 10.0.0.2
-    destination_port: 22
-    comment: Forward SSH to client
-    in_interface: "{{ iface_wan }}"
-    out_interface: "{{ iface_lan }}"
-
-gateway_forward_rules:
-  - from: "{{ iface_lan }}"
-    to: "{{ iface_wan }}
+    comment: Allow echo request (ping)
 ```
 
 ## Author
