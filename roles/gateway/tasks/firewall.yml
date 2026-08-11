@@ -1,22 +1,68 @@
 ---
-
-- name: Generate and apply IPv4 firewall rules
+- name: Generate temporary firewall rules
   ansible.builtin.template:
-    src: rules.v4.j2
-    dest: /etc/iptables/rules.v4
-    group: root
-    owner: root
-    mode: "0644"
-    validate: iptables-restore --test %s
-  notify: Apply ipv4tables rules
+    src: "{{ item.template_rules }}"
+    dest: "{{ item.tmp_rules }}"
+    mode: "0600"
+  loop: "{{ gateway_iptables }}"
+  register: gateway_rules_generated
 
+- name: Validate temporary firewall rules
+  ansible.builtin.command: "{{ item.restore_rules }} --test {{ item.tmp_rules }}"
+  loop: "{{ gateway_iptables }}"
+  changed_when: false
+  when: gateway_rules_generated.changed
+  tags:
+    - skip_ansible_lint
 
-- name: Generate and apply IPv6 firewall rules (Default DROP)
-  ansible.builtin.template:
-    src: rules.v6.j2
-    dest: /etc/iptables/rules.v6
-    group: root
-    owner: root
-    mode: "0644"
-    validate: iptables-restore --test %s
-  notify: Apply ipv6tables rules
+- name: Create temporary backup of current working rules
+  ansible.builtin.shell: "{{ item.save_rules }} > {{ item.backup_rules }}"
+  loop: "{{ gateway_iptables }}"
+  changed_when: false
+  when: gateway_rules_generated.changed
+  tags:
+    - skip_ansible_lint
+
+- name: Start emergency rollback timer in background
+  ansible.builtin.shell: |
+    (
+      sleep 30
+      {{ item.restore_rules }} < {{ item.backup_rules }}
+      logger "Ansible Firewall: Connection lost! Rolled back to previous ruleset."
+    ) & echo $! > {{ item.rollback_pid }}
+  loop: "{{ gateway_iptables }}"
+  changed_when: false
+  when: gateway_rules_generated.changed
+  tags:
+    - skip_ansible_lint
+
+- name: Apply new firewall rules right now
+  ansible.builtin.shell: "{{ item.restore_rules }} < {{ item.tmp_rules }}"
+  loop: "{{ gateway_iptables }}"
+  changed_when: false
+  when: gateway_rules_generated.changed
+  tags:
+    - skip_ansible_lint
+
+- name: Connection check - Verify SSH is still working
+  ansible.builtin.ping:
+
+- name: Fix rules permanently if connection is safe
+  ansible.builtin.command: netfilter-persistent save
+  changed_when: false
+  when: gateway_rules_generated.changed
+  tags:
+    - skip_ansible_lint
+
+- name: Terminate rollback timer (We are safe)
+  ansible.builtin.shell: |
+    if [ -f {{ item.rollback_pid }} ]; then
+      PID=$(cat {{ item.rollback_pid }})
+      kill $PID 2>/dev/null
+      rm -f {{ item.rollback_pid }}
+    fi
+  loop: "{{ gateway_iptables }}"
+  changed_when: false
+  when: gateway_rules_generated.changed
+  tags:
+    - skip_ansible_lint

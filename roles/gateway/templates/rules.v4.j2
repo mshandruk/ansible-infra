@@ -1,5 +1,3 @@
-{{ gateway_title }}
-
 *filter
 :INPUT {{ gateway_default_input_policy }} [0:0]
 :FORWARD {{ gateway_default_forward_policy }} [0:0]
@@ -9,14 +7,7 @@
 -A INPUT -i lo -j ACCEPT
 -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 -A INPUT -m conntrack --ctstate INVALID -j DROP
-{% set cmd %}
--A INPUT -p tcp --dport {{ ansible_port | default(22) }} -m conntrack --ctstate NEW
--m comment --comment "SSH management for Ansible."
--j ACCEPT
-{% endset %}
-{{ cmd | split | join(' ') }}
-
-{% for rule in gateway_input_rules %}
+{% for rule in gateway_system_input_rules + gateway_input_rules %}
     {%- set cmd -%}
     -A INPUT
 

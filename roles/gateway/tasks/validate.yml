@@ -1,5 +1,4 @@
 ---
-
 - name: Check mandatory global variables
   ansible.builtin.assert:
     that:
