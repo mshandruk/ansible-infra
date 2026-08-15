@@ -1,0 +1,44 @@
+{% macro make_user(user) -%}
+    {% set alg = user.password_hash_alg | default('sha512') -%}
+    {% set salt = user.password_salt | default('SecureSalt123') -%}
+    user {{ user.name }} password {{ user.password | password_hash(alg, salt) }}
+{%- endmacro %}
+
+{% macro make_option(key, value) -%}
+    option {{ "%-15s" | format(key) }} {{ value }}
+{%- endmacro %}
+
+{% macro make_timeout(key, value) -%}
+    timeout {{ "%-15s" | format(key) }} {{ value }}
+{%- endmacro %}
+
+{% macro make_rule(rule) -%}
+    http-request {{ rule }}
+{%- endmacro %}
+
+{% macro make_stat(stat) -%}
+    stats {{ stat }}
+{%- endmacro %}
+
+{% macro make_balance(balance) -%}
+    balance {{ balance }}
+{%- endmacro %}
+
+{% macro make_default_backend(name) -%}
+    default_backend {{ name }}
+{%- endmacro %}
+
+{% macro make_backend(name) -%}
+    backend {{ name }}
+{%- endmacro %}
+
+{% macro make_ansible_server(host, hostvars, backend) -%}
+    {% set host_ip = hostvars[host]['ansible_host'] | default(host) -%}
+    {% set port = backend.backend_port | default(80) | string -%}
+    {% set check = backend.server_check_params | default('check') -%}
+    server {{ host }} {{ host_ip }}:{{ port }} {{ check }}
+{%- endmacro %}
+
+{% macro make_static_server(server) -%}
+    server {{ server.name }} {{ server.address }} {{ server.check | default('check') }}
+{%- endmacro %}

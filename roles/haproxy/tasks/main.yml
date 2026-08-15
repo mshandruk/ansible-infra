@@ -1,0 +1,65 @@
+---
+- name: Haproxy install and configuration
+  become: true
+  block:
+  - name: Install haproxy
+    ansible.builtin.package:
+      name: haproxy
+      state: present
+
+  - name: Create Haproxy configuration drop-in directory
+    ansible.builtin.file:
+      path: "{{ haproxy_conf_dir }}"
+      state: directory
+      mode: "0755"
+      owner: "root"
+      group: "root"
+
+  - name: Generate Haproxy configurations from generic templates
+    ansible.builtin.template:
+      src: "haproxy_generic.cfg.j2"
+      dest: "{{ haproxy_conf_dir }}/{{ item.name }}.cfg"
+      mode: "0644"
+      owner: "root"
+      group: "root"
+      validate: haproxy -c -f "{{ haproxy_root_dir }}/haproxy.cfg" -f %s
+    loop: "{{ haproxy_configs }}"
+    notify: Restart haproxy
+
+  - name: Create systemd haproxy drop-in directory
+    ansible.builtin.file:
+      state: directory
+      path: "{{ haproxy_systemd_override_dir }}"
+      owner: "root"
+      group: "root"
+      mode: "0755"
+
+  - name: Copy drop-in systemd haproxy configuration
+    ansible.builtin.template:
+      src: systemd_override.conf.j2
+      dest: "{{ haproxy_systemd_override_dir }}/override.conf"
+      owner: "root"
+      group: "root"
+      mode: "0644"
+    register: haproxy_systemd
+
+  - name: Reload systemd to apply drop-in changes
+    ansible.builtin.systemd:
+      daemon_reload: true
+      name: haproxy
+    when: haproxy_systemd.changed
+    tags:
+    - skip_ansible_lint
+
+  - name: Restart haproxy to apply new systemd settings
+    ansible.builtin.systemd:
+      name: haproxy
+      state: restarted
+    when: haproxy_systemd.changed
+    tags:
+    - skip_ansible_lint
+
+  - name: Provide start haproxy service
+    ansible.builtin.systemd:
+      name: haproxy
+      state: started

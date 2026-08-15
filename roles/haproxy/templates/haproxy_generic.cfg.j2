@@ -1,0 +1,70 @@
+#jinja2: lstrip_blocks: True,trim_blocks: True
+{% import 'haproxy_macros.j2' as macros with context -%}
+
+{# section userlist #}
+{% for userlist in item.userlists | default([]) -%}
+    userlist {{ userlist.name }}
+    {% for user in userlist.users | default([]) -%}
+        {{ macros.make_user(user) | indent(4, true) }}
+    {% endfor -%}
+    {#  #}
+
+{% endfor -%}
+
+{# section defaults #}
+{% if item.defaults is defined -%}
+    defaults
+    mode {{ item.defaults.mode | default('http') }}
+    log {{ item.defaults.log | default('global') }}
+    retries {{ item.defaults.retries | default(1) }}
+    {% for key, value in (item.defaults.options | default({})).items() -%}
+        {{ macros.make_option(key, value) | indent(4, true) }}
+    {% endfor -%}
+    {% for key, value in (item.defaults.timeouts | default({})).items() -%}
+        {{ macros.make_timeout(key, value) | indent(4, true) }}
+    {% endfor -%}
+    {#  #}
+
+{% endif -%}
+
+{# section frontend #}
+{% for frontend in item.frontends | default([]) -%}
+    frontend {{ frontend.name }}
+    bind {{ frontend.bind }}
+    mode {{ frontend.mode | default('http') }}
+    {% for rule in frontend.http_request_rules | default([]) -%}
+        {{ macros.make_rule(rule) | indent(4, true) }}
+    {% endfor -%}
+    {% for key, value in (frontend.options | default({})).items() -%}
+        {{ macros.make_option(key, value) | indent(4, true) }}
+    {% endfor -%}
+    {{ macros.make_default_backend(frontend.default_backend) | indent(4, first=true) }}
+    {#  #}
+
+{% endfor -%}
+
+{# section backend #}
+{% for backend in item.backends | default([]) -%}
+    {{ macros.make_backend(backend.name) }}
+    mode {{ backend.mode | default('http') }}
+    {% if backend.balance is defined -%}
+        {{ macros.make_balance(backend.balance ) | indent(4, true) }}
+    {% endif -%}
+    {% for stat in backend.stats | default([]) -%}
+        {{ macros.make_stat(stat) | indent(4, true) }}
+    {% endfor -%}
+    {% for key, value in (backend.options | default({})).items() -%}
+        {{ macros.make_option(key, value) | indent(4, true) }}
+    {% endfor -%}
+    {% if backend.ansible_group is defined and groups[backend.ansible_group] is defined -%}
+        {% for host in groups[backend.ansible_group] -%}
+            {{ macros.make_ansible_server(host, hostvars, backend) | indent(4, true) }}
+        {% endfor -%}
+    {% elif backend.servers is defined -%}
+        {% for server in backend.servers -%}
+            {{ macros.make_static_server(server) | indent(4, true) }}
+        {% endfor -%}
+    {% endif -%}
+    {#  #}
+
+{% endfor -%}
