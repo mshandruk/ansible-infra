@@ -35,6 +35,7 @@ Each role is responsible for a single area of system configuration.
 | [docker](roles/docker/README.md)       | Install and configure Docker.          |
 | [gateway](roles/gateway/README.md)     | Deploy the net gateway server.         |
 | [kvm](roles/kvm/README.md)             | Deploy the KVM virtualization host.    |
+| [haproxy](roles/haproxy/README.md)             | Deploy the Haproxy load balancer.    |
 
 Role defaults are stored in:
 

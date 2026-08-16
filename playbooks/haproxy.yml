@@ -1,5 +1,5 @@
 ---
 - name: Deploy haproxy load balancer
-  hosts: load_balancers
+  hosts: haproxy
   roles:
-    - haproxy
+  - haproxy
