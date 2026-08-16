@@ -2,3 +2,4 @@
 haproxy_root_dir: "/etc/haproxy"
 haproxy_conf_dir: "{{ haproxy_root_dir }}/conf.d"
 haproxy_systemd_override_dir: /etc/systemd/system/haproxy.service.d
+haproxy_tmp_systemd_override_dir: /tmp/systemd/system/haproxy.service.d

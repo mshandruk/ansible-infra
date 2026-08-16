@@ -4,3 +4,8 @@
   ansible.builtin.systemd:
     state: restarted
     name: haproxy
+
+- name: Reload systemd
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true

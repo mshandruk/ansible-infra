@@ -1,0 +1,39 @@
+---
+- name: Create temporary systemd drop-in directory
+  ansible.builtin.file:
+    state: directory
+    path: "{{ haproxy_tmp_systemd_override_dir }}"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+
+- name: Generate temporary haproxy override systemd configuration
+  ansible.builtin.template:
+    src: systemd_override.conf.j2
+    dest: "{{ haproxy_tmp_systemd_override_dir }}/override.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+
+- name: Validate haproxy systemd configuration with drop-ins applied
+  ansible.builtin.command: systemd-analyze verify haproxy.service
+  environment:
+    SYSTEMD_UNIT_PATH: "{{ haproxy_tmp_systemd_override_dir | dirname }}:" # path to parent dir
+  changed_when: false
+
+- name: Copy validated haproxy systemd configuration with drop-ins applied
+  ansible.builtin.copy:
+    remote_src: true
+    src: "{{ haproxy_tmp_systemd_override_dir }}"
+    dest: "/etc/systemd/system/"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+  notify:
+    - Reload systemd
+    - Restart haproxy
+
+- name: Provide start haproxy service
+  ansible.builtin.systemd:
+    name: haproxy
+    state: started

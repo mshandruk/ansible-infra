@@ -1,0 +1,19 @@
+---
+- name: Create Haproxy configuration drop-in directory
+  ansible.builtin.file:
+    path: "{{ haproxy_conf_dir }}"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: "0755"
+
+- name: Generate Haproxy configurations from generic templates
+  ansible.builtin.template:
+    src: "haproxy_generic.cfg.j2"
+    dest: "{{ haproxy_conf_dir }}/{{ item.name }}.cfg"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+    validate: haproxy -c -f "{{ haproxy_root_dir }}/haproxy.cfg" -f %s
+  loop: "{{ haproxy_configs }}"
+  notify: Restart haproxy
