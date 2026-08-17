@@ -7,6 +7,7 @@ Collection of Ansible playbooks and roles for managing Linux infrastructure.
 * [Quick Start](docs/quickstart.md)
 * [Playbooks](docs/playbooks.md)
 * [Commands Reference](docs/commands.md)
+* [Inventory](docs/inventory.md)
 
 ## Project Layout
 
@@ -35,35 +36,8 @@ Each role is responsible for a single area of system configuration.
 | [docker](roles/docker/README.md)       | Install and configure Docker.          |
 | [gateway](roles/gateway/README.md)     | Deploy the net gateway server.         |
 | [kvm](roles/kvm/README.md)             | Deploy the KVM virtualization host.    |
-| [haproxy](roles/haproxy/README.md)             | Deploy the Haproxy load balancer.    |
+| [haproxy](roles/haproxy/README.md)     | Deploy the Haproxy load balancer.      |
 
-Role defaults are stored in:
-
-```text
-roles/<role>/defaults/main.yml
-```
-
-Inventory-specific values should be overridden using:
-
-```text
-inventories/<inventory>/group_vars/
-inventories/<inventory>/host_vars/
-```
-
-## Inventory
-
-The repository contains an example inventory layout.
-
-```text
-inventories/
-├── example/
-│   ├── hosts.yml
-│   ├── group_vars/
-│   │   └── all.yml
-│   └── host_vars/
-```
-
-Copy the example inventory and customize it for your own environment.
 
 ## References
 

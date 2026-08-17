@@ -90,3 +90,6 @@ ansible all \
     -m setup \
     -a "filter=ansible_distribution*"
 ```
+
+---
+[← Back to project README](../README.md)

@@ -30,3 +30,6 @@ Install the required packages on the machine where Ansible will be executed.
     ```bash
     source .venv/bin/activate
     ```
+
+---
+[← Back to project README](../README.md)
