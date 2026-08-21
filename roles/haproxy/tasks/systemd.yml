@@ -37,3 +37,4 @@
   ansible.builtin.systemd:
     name: haproxy
     state: started
+    enabled: true
