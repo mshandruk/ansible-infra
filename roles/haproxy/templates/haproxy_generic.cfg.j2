@@ -35,9 +35,15 @@
     {% for rule in frontend.http_request_rules | default([]) -%}
         {{ macros.make_rule(rule) | indent(4, true) }}
     {% endfor -%}
+
     {% for key, value in (frontend.options | default({})).items() -%}
         {{ macros.make_option(key, value) | indent(4, true) }}
     {% endfor -%}
+
+    {% for key, value in (frontend.timeouts | default({})).items() -%}
+        {{ macros.make_timeout(key, value) | indent(4, true) }}
+    {% endfor -%}
+
     {{ macros.make_default_backend(frontend.default_backend) | indent(4, first=true) }}
     {#  #}
 
@@ -50,12 +56,23 @@
     {% if backend.balance is defined -%}
         {{ macros.make_balance(backend.balance ) | indent(4, true) }}
     {% endif -%}
+
+    {% if backend.retries is defined -%}
+        {{ macros.make_param('retries',  backend.retries | int) | indent(4, true) }}
+    {% endif -%}
+
     {% for stat in backend.stats | default([]) -%}
         {{ macros.make_stat(stat) | indent(4, true) }}
     {% endfor -%}
+
     {% for key, value in (backend.options | default({})).items() -%}
         {{ macros.make_option(key, value) | indent(4, true) }}
     {% endfor -%}
+    
+    {% for key, value in (backend.timeouts | default({})).items() -%}
+        {{ macros.make_timeout(key, value) | indent(4, true) }}
+    {% endfor -%}
+    
     {% if backend.ansible_group is defined and groups[backend.ansible_group] is defined -%}
         {% for host in groups[backend.ansible_group] -%}
             {{ macros.make_ansible_server(host, hostvars, backend) | indent(4, true) }}

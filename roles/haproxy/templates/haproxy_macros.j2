@@ -5,7 +5,11 @@
 {%- endmacro %}
 
 {% macro make_option(key, value) -%}
-    option {{ "%-15s" | format(key) }} {{ value }}
+    {% if value is defined and value | string | trim != "" -%}
+        option {{ "%-15s" | format(key) }} {{ value }}
+    {%- else -%}
+        option {{ key }}
+    {%- endif -%}
 {%- endmacro %}
 
 {% macro make_timeout(key, value) -%}
@@ -30,6 +34,10 @@
 
 {% macro make_backend(name) -%}
     backend {{ name }}
+{%- endmacro %}
+
+{% macro make_param(key, value) -%}
+    {{ key }} {{ value }}
 {%- endmacro %}
 
 {% macro make_ansible_server(host, hostvars, backend) -%}
