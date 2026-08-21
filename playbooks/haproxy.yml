@@ -2,4 +2,4 @@
 - name: Deploy haproxy load balancer
   hosts: haproxy
   roles:
-  - haproxy
+    - haproxy
