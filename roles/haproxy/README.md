@@ -45,15 +45,16 @@ all:
     haproxy:
 
   children:
-    uptime_site:
+    host_info_servers:
       hosts:
-        vm-web-05:
-        vm-web-06:
+        vm-web-01:
+        vm-web-02:
 ```
 
 inventories/lab/host_vars/haproxy.yml
 
 ```yaml
+
 haproxy_configs:
 - name: stats
   userlists:
@@ -65,8 +66,8 @@ haproxy_configs:
       password_secure_salt: "SecureSalt123"
   frontends:
   - name: stats-in
-    bind: "*:8404"
     mode: "http"
+    bind: "*:8404"
     http_request_rules:
     - 'auth realm "HAProxy Statistics" if ! { http_auth(stats-users) }'
     default_backend: "stats-out"
@@ -78,29 +79,30 @@ haproxy_configs:
     - "uri /"
     - "refresh 10s"
 
-- name: uptime_site
-  defaults:
+- name: host_info
+  frontends:
+  - name: host_info
     mode: "http"
-    log: "global"
+    bind: "*:8443"
+    timeouts:
+      client: "30s"
+    options:
+      httplog: ""
+    default_backend: "host_info_pool"
+  backends:
+  - name: host_info_pool
+    mode: "http"
+    backend_port: 80
+    balance: "roundrobin"
     retries: 1
     timeouts:
       connect: "400ms"
       check: "400ms"
-      client: "30s"
       server: "30s"
     options:
       redispatch: 1
-  frontends:
-  - name: http_front
-    bind: "*:8443"
-    default_backend: "uptime_site_pool"
-  backends:
-  - name: uptime_site_pool
-    balance: "roundrobin"
-    options:
-      httpchk: "HEAD /"
-    ansible_group: "uptime_site"
-    backend_port: 80
+      httpchk: "GET /"
+    ansible_group: "host_info_servers"
     server_check_params: "check inter 500ms fall 2 rise 1"
 
 ```
