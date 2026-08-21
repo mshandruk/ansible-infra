@@ -27,6 +27,7 @@ upgrade-system
 | `kvm`            | Deploy and configure a KVM virtualization host        |
 | `haproxy`        | Install and configure the HAProxy load balancer       |
 | `upgrade-system` | Update installed system packages                      |
+| `nginx`          | Deploy nginx web server                               |
 
 ## Running a Playbook
 
