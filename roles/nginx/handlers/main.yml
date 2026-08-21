@@ -1,0 +1,14 @@
+---
+# handlers file for roles/nginx
+
+- name: Restart nginx
+  become: true
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+
+- name: Reload nginx
+  become: true
+  ansible.builtin.systemd:
+    name: nginx
+    state: reloaded
