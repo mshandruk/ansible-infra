@@ -3,6 +3,7 @@
 
 common_timezone: "Etc/UTC"
 common_locales:
-  - en_US.UTF-8
+  - "en_US.UTF-8"
 
+common_default_locale: "en_US.UTF-8"
 common_packages: []

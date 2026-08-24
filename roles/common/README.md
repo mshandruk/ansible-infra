@@ -4,8 +4,8 @@ Common system configuration for linux hosts.
 
 ## Requirements
 
-- Debian 13+
-- Ubuntu 22.04+
+- Debian family (Debian 13+, Ubuntu 24.04+)
+- RedHat family (Rocky Linux 10+)
 
 > Older distributions may work but are not regularly tested.
 
@@ -17,11 +17,12 @@ Common system configuration for linux hosts.
 
 ## Role Variables
 
-| Variable          | Default         | Description         |
-|-------------------|-----------------|---------------------|
-| `common_timezone` | `Etc/UTC`       | System timezone     |
-| `common_locales`  | ["en_US.UTF-8"] | Locales to generate |
-| `common_packages` | []              | Packages to install |
+| Variable                | Default         | Description           |
+| ----------------------- | --------------- | --------------------- |
+| `common_timezone`       | `Etc/UTC`       | System timezone       |
+| `common_locales`        | ["en_US.UTF-8"] | Locales to generate   |
+| `common_default_locale` | `en_US.UTF-8`   | System default locale |
+| `common_packages`       | []              | Packages to install   |
 
 ## Dependencies
 
