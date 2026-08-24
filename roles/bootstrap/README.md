@@ -4,8 +4,8 @@ Prepare a new linux host for ansible automation.
 
 ## Requirements
 
-- Debian 13+
-- Ubuntu 22.04+
+- Debian family (Debian 13+, Ubuntu 24.04+)
+- RedHat family (Rocky Linux 10+)
 
 > Older distributions may work but are not regularly tested.
 
@@ -24,7 +24,7 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519_ansible -N ""
 ## Role Variables
 
 | Variable                   | Default                                    | Description                                  |
-|----------------------------|--------------------------------------------|----------------------------------------------|
+| -------------------------- | ------------------------------------------ | -------------------------------------------- |
 | `bootstrap_user`           | `ansible`                                  | Automation user name                         |
 | `bootstrap_sudo_nopasswd`  | `true`                                     | Allow passwordless sudo                      |
 | `bootstrap_authorized_key` | "{{ lookup('file', ansible_public_key) }}" | Public key installed for the automation user |
