@@ -1,0 +1,11 @@
+---
+- name: Reload systemd
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart host-info
+  become: true
+  ansible.builtin.systemd:
+    name: host-info
+    state: restarted

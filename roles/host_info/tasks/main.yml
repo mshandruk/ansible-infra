@@ -1,0 +1,64 @@
+---
+- name: Deploy host_monitor app
+  become: true
+  block:
+    - name: Create app user
+      ansible.builtin.user:
+        name: "{{ host_info_user }}"
+        shell: /sbin/nologin
+        state: present
+
+    - name: Create application directory
+      ansible.builtin.file:
+        state: directory
+        path: "{{ host_info_workdir }}"
+        owner: "{{ host_info_user }}"
+        group: "{{ host_info_group }}"
+        mode: "0755"
+
+    - name: Copy application
+      ansible.builtin.copy:
+        src: server.py
+        dest: "{{ host_info_workdir }}/server.py"
+        owner: "{{ host_info_user }}"
+        group: "{{ host_info_group }}"
+        mode: "0755"
+
+    - name: Generate systemd service unit
+      ansible.builtin.template:
+        src: host-info.service.j2
+        dest: /etc/systemd/system/host-info.service
+        owner: root
+        group: root
+        mode: "0644"
+      notify:
+        - Reload systemd
+        - Restart host-info
+
+    - name: Generate Nginx site config
+      ansible.builtin.template:
+        src: nginx.j2
+        dest: /etc/nginx/sites-available/host-info
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload nginx
+
+    - name: Enable Nginx site
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/host-info
+        dest: /etc/nginx/sites-enabled/host-info
+        state: link
+      notify: Reload nginx
+
+    - name: Disable default Nginx site
+      ansible.builtin.file:
+        dest: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: Reload nginx
+
+    - name: Ensure autostart App service
+      ansible.builtin.systemd:
+        name: host-info.service
+        state: started
+        enabled: true

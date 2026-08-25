@@ -1,0 +1,7 @@
+---
+- name: Deploy host info application
+  hosts: host_info_servers
+  roles:
+    - common
+    - nginx
+    - host_info

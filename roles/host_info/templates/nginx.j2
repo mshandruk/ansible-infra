@@ -1,0 +1,14 @@
+server {
+    listen {{ host_info_listen_port }} default_server;
+    listen [::]:{{ host_info_listen_port }} default_server;
+
+    server_name {{ host_info_server_name }};
+
+    location / {
+        proxy_pass http://{{ host_info_proxy_addr }}:{{ host_info_proxy_port }};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

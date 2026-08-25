@@ -1,0 +1,13 @@
+---
+# System environment for application
+host_info_user: "host_info"
+host_info_group: "host_info"
+host_info_workdir: "/opt/host_info"
+
+# Backend settings (Python)
+host_info_proxy_addr: "127.0.0.1"
+host_info_proxy_port: 8000
+
+# Frontend settings (Nginx)
+host_info_listen_port: 80
+host_info_server_name: "_"

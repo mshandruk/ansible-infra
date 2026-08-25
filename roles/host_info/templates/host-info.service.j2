@@ -1,0 +1,20 @@
+[Unit]
+Description=Host info web app
+After=network.target
+
+[Service]
+Type=simple
+
+User={{ host_info_user }}
+Group={{ host_info_group }}
+
+WorkingDirectory={{ host_info_workdir }}
+ExecStart=/usr/bin/python3 {{ host_info_workdir }}/server.py
+
+Restart=always
+RestartSec=3
+
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
