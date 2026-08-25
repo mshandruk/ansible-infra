@@ -8,38 +8,12 @@
       community.general.timezone:
         name: "{{ common_timezone }}"
 
-    - name: Ensure locale package is installed on Debian family
-      ansible.builtin.package:
-        name: locales
-        state: present
-        update_cache: true
+    - name: Load dist-specific tasks (Debian family)
+      ansible.builtin.import_tasks: debian.yml
       when: ansible_os_family == 'Debian'
 
-    - name: Generate locales for Debian family
-      community.general.locale_gen:
-        name: "{{ item }}"
-      loop: "{{ common_locales }}"
-      when: ansible_os_family == 'Debian'
-
-    - name: Set default locale on Debian family
-      ansible.builtin.lineinfile:
-        path: /etc/default/locale
-        regexp: "^LANG="
-        line: "LANG={{ common_default_locale }}"
-      when: ansible_os_family == 'Debian'
-
-    - name: Ensure locales are installed for RedHat family
-      ansible.builtin.package:
-        name: "glibc-langpack-{{ item | regex_search('^([a-z]{2})_', '\\1') | default(['en']) | first }}"
-        state: present
-      loop: "{{ common_locales }}"
-      when: ansible_os_family == 'RedHat'
-
-    - name: Set default locale on RedHat family
-      ansible.builtin.lineinfile:
-        path: /etc/locale.conf
-        regexp: "^LANG="
-        line: "LANG={{ common_default_locale }}"
+    - name: Load dist-specific tasks (RedHat family)
+      ansible.builtin.import_tasks: redhat.yml
       when: ansible_os_family == 'RedHat'
 
     - name: Install baseline packages

@@ -1,0 +1,12 @@
+---
+- name: Ensure glibc-langpack package is installed
+  ansible.builtin.package:
+    name: "glibc-langpack-{{ item | regex_search('^([a-z]{2})_', '\\1') | default(['en']) | first }}"
+    state: present
+  loop: "{{ common_locales }}"
+
+- name: Configure system default locale
+  ansible.builtin.lineinfile:
+    path: /etc/locale.conf
+    regexp: "^LANG="
+    line: "LANG={{ common_default_locale }}"

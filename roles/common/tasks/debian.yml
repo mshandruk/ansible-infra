@@ -1,0 +1,21 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure locales package is installed
+  ansible.builtin.package:
+    name: locales
+    state: present
+
+- name: Generate locales
+  community.general.locale_gen:
+    name: "{{ item }}"
+  loop: "{{ common_locales }}"
+
+- name: Configure system default locale
+  ansible.builtin.lineinfile:
+    path: /etc/default/locale
+    regexp: "^LANG="
+    line: "LANG={{ common_default_locale }}"

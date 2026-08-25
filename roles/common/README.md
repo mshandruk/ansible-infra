@@ -4,7 +4,7 @@ Common system configuration for linux hosts.
 
 ## Requirements
 
-- Debian family (Debian 13+, Ubuntu 24.04+)
+- Debian family (Debian 11+, Ubuntu 24.04+)
 - RedHat family (Rocky Linux 10+)
 
 > Older distributions may work but are not regularly tested.
