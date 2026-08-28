@@ -4,10 +4,10 @@ Collection of Ansible playbooks and roles for managing Linux infrastructure.
 
 ## Documentation
 
-* [Quick Start](docs/quickstart.md)
-* [Playbooks](docs/playbooks.md)
-* [Commands Reference](docs/commands.md)
-* [Inventory](docs/inventory.md)
+- [Quick Start](docs/quickstart.md)
+- [Playbooks](docs/playbooks.md)
+- [Commands Reference](docs/commands.md)
+- [Inventory](docs/inventory.md)
 
 ## Project Layout
 
@@ -20,7 +20,7 @@ Collection of Ansible playbooks and roles for managing Linux infrastructure.
 ```
 
 | Directory      | Description            |
-|----------------|------------------------|
+| -------------- | ---------------------- |
 | `inventories/` | Inventory files        |
 | `playbooks/`   | Entry-point playbooks  |
 | `roles/`       | Reusable Ansible roles |
@@ -30,7 +30,7 @@ Collection of Ansible playbooks and roles for managing Linux infrastructure.
 Each role is responsible for a single area of system configuration.
 
 | Role                                   | Description                            |
-|----------------------------------------|----------------------------------------|
+| -------------------------------------- | -------------------------------------- |
 | [bootstrap](roles/bootstrap/README.md) | Prepare a host for Ansible automation. |
 | [common](roles/common/README.md)       | Configure common system settings.      |
 | [docker](roles/docker/README.md)       | Install and configure Docker.          |
@@ -39,6 +39,15 @@ Each role is responsible for a single area of system configuration.
 | [haproxy](roles/haproxy/README.md)     | Deploy the Haproxy load balancer.      |
 | [nginx](roles/nginx/README.md)         | Deploy the nginx core.                 |
 
+## Scripts
+
+| Script | Description |
+| :----- | :---------- |
+| `scripts/mirror_rockylinux.sh` | Switch Rocky Linux repositories to Yandex mirror |
+### Usage
+```bash
+ansible all -i ip-address, -m script -a "scripts/mirror_rockylinux.sh"
+```
 
 ## References
 
