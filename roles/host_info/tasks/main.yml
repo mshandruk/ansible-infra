@@ -1,5 +1,5 @@
 ---
-- name: Deploy host_monitor app
+- name: Deploy host_info app
   become: true
   block:
     - name: Create app user
