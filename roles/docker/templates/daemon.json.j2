@@ -1,7 +1,7 @@
 {
-	"bip": "{{ bip }}",
+	"bip": "{{ docker_bip }}",
 	"default-address-pools": [{
-		"base": "{{ base_net }}",
-		"size": {{ size_nets | int }}
+		"base": "{{ docker_address_pool }}",
+		"size": {{ docker_address_pool_size | int }}
 	}]
 }

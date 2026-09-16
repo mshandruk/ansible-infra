@@ -1,0 +1,13 @@
+---
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-buildx-plugin
+  - docker-compose-plugin
+
+docker_user: ""
+docker_configure_net: false
+docker_bip: "172.30.0.1/16"
+docker_address_pool: "172.31.0.0/16"
+docker_address_pool_size: 24

@@ -1,99 +1,116 @@
-docker
-=========
+# docker
 
-* Linux
-* ansible 2.10.8
+Deploy Docker on supported Linux distributions.
 
-Supported dists:
+## Requirements
 
-* Ubuntu22.04
-* Debian11
-* Centos7
-* Centos9
-* Fedora37
+- Debian family: Debian 13+, Ubuntu 24.04+
+- RedHat family: Rocky Linux 10+
 
-Role Variables
---------------
+> Older distributions may work but are not regularly tested.
 
-#### Optional
+## Role Variables
 
-````
-bip: <bridge_ip/prefix>
-base_net: <base network ip/prefix>
-size_nets: <the size of the created networks>
-docker_user: <username>
-````
+> Default variable values can be found in `defaults/main.yml`.
 
-Example Playbook
-----------------
+`docker_user`
 
-    - hosts: dockers
-      roles:
-         - { role: docker }
+Optional username to add to the `docker` group.
+The user must be already exist on the target host. The role does not create users.
 
-Quick start
--------
+### Docker network
 
-1. Clone this repository
+In cases where default docker network overlaps with the host network, breaking host routing.
 
-2. Install public ssh-key on remote host
+Docker network configuration is disabled by default:
+`docker_configure_net: false`
 
-```
-ssh-copy-id -i ~/.ssh/id_rsa.pub root@remote_address
+To enable it:
+`docker_configure_net: true`
+
+The default network configuration is:
+
+```yaml
+docker_bip: "172.30.0.1/16"
+docker_address_pool: "172.31.0.0/16"
+docker_address_pool_size: 24
 ```
 
-3. Generate inventory
+`docker_bip` - defines the address and network prefix of docker default bridge(docker0).
+`docker_address_pool` - defines the address pool for automatically created user-defined docker network.
+`docker_address_pool_size` - defines the prefix size of network allocated from docker_address_pool.
 
-```bash
-cat <<EOF  > inventory
-[dockers]
-debian.test.lab
-EOF
-```
+For example:
 
-4. Generate playbook
+`docker create --name alpine alpine`
+172.30.0.0/16
+└── Docker default bridge
+└── docker0: 172.30.0.1
 
-```bash
-cat <<EOF  > play-docker.yml
-- hosts: dockers
+`docker network create frontend`
+`docker network create backend`
+172.31.0.0/16
+└── Docker network address pool
+├── 172.31.0.0/24
+├── 172.31.1.0/24
+├── 172.31.2.0/24
+└── ...
+
+Make sure that `docker_bip` and `docker_address_pool` do not overlap with
+network used by the host.
+
+## Features
+
+- Installing Docker packages from docker repository.
+- Adding an existing user to the `docker` group.
+- Configuring docker network.
+
+## Dependencies
+
+None.
+
+## Example Playbook
+
+`playbooks/docker.yml`
+
+```yaml
+---
+- name: Deploy docker
+  hosts: all
   roles:
-     - { role: docker }
-EOF
+    - docker
 ```
 
-5. Run playbook
+### Deploy docker with defaults
 
-````
-ansible-playbook -i inventory play-docker.yml -u root
-````
-
-Installation options
----------------
-Install on local host:
-
-```
-sudo ansible-playbook -c local  docker.yml
+```bash
+ansible-playbook -i <inventory> playbooks/docker.yml
 ```
 
-Install on remote host:
+### Deploy and add existing user for manage docker cli
 
-```
-ansible-playbook -i <address your host>, docker.yml
-```
-
-Install and add user in docker group:
-
-``` 
-ansible-playbook -i <address your host>, docker.yml -e docker_user=<your username>
+```bash
+ansible-playbook -i <inventory> playbooks/docker.yml \
+  -e "docker_user=<username>"
 ```
 
-Install with another docker network:
+### Deploy docker with docker network configuration
 
-``` 
-ansible-playbook -i <address your host>, docker.yml -e bip=10.30.0.1/16 -e base_net=10.0.0.0/8 -e size_nets=16
+```bash
+ansible-playbook -i <inventory> playbooks/docker.yml \
+  -e "docker_configure_net=true"
 ```
 
-License
--------
+### Deploy with a custom docker network configuration
 
-MIT
+```bash
+ansible-playbook -i <inventory> playbooks/docker.yml \
+  -e "docker_configure_net=true" \
+  -e "docker_bip=172.30.0.1/16" \
+  -e "docker_address_pool=172.31.0.0/16" \
+  -e "docker_address_pool_size=24"
+```
+
+## Author
+
+Maxim Shandruk
