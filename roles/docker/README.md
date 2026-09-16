@@ -42,19 +42,25 @@ docker_address_pool_size: 24
 
 For example:
 
-`docker create --name alpine alpine`
+```text
+docker create --name alpine alpine
+
 172.30.0.0/16
 └── Docker default bridge
 └── docker0: 172.30.0.1
+```
 
-`docker network create frontend`
-`docker network create backend`
+```text
+
+docker network create frontend
+docker network create backend
+
 172.31.0.0/16
 └── Docker network address pool
 ├── 172.31.0.0/24
 ├── 172.31.1.0/24
-├── 172.31.2.0/24
 └── ...
+```
 
 Make sure that `docker_bip` and `docker_address_pool` do not overlap with
 network used by the host.
