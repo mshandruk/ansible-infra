@@ -38,13 +38,16 @@ Each role is responsible for a single area of system configuration.
 | [kvm](roles/kvm/README.md)             | Deploy the KVM virtualization host.    |
 | [haproxy](roles/haproxy/README.md)     | Deploy the Haproxy load balancer.      |
 | [nginx](roles/nginx/README.md)         | Deploy the nginx core.                 |
+| [host_info](roles/host_info/README.md) | Deploy the host_info web app           |
 
 ## Scripts
 
-| Script | Description |
-| :----- | :---------- |
+| Script                         | Description                                      |
+| :----------------------------- | :----------------------------------------------- |
 | `scripts/mirror_rockylinux.sh` | Switch Rocky Linux repositories to Yandex mirror |
+
 ### Usage
+
 ```bash
 ansible all -i ip-address, -m script -a "scripts/mirror_rockylinux.sh"
 ```
