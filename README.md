@@ -49,8 +49,11 @@ Each role is responsible for a single area of system configuration.
 ### Usage
 
 ```bash
-ansible all -i ip-address, -m script -a "scripts/mirror_rockylinux.sh"
+ansible all -i inventories/lab -l rocky -m script -a "scripts/mirror_rockylinux.sh" -b -K
 ```
+
+`-b run sudo`
+`-K prompt sudo password`
 
 ## References
 
